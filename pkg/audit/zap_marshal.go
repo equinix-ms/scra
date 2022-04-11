@@ -4,6 +4,16 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+func marshalStringArray(array []string) zapcore.ArrayMarshalerFunc {
+	return func(enc zapcore.ArrayEncoder) error {
+		for _, element := range array {
+			enc.AppendString(element)
+		}
+
+		return nil
+	}
+}
+
 func (n *Namespaces) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddBool("networking", n.HostNetworking)
 	enc.AddBool("pid", n.HostPID)
@@ -16,51 +26,17 @@ func (n *Namespaces) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 
 func (n *NetworkInfo) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("device", n.Device)
-	enc.AddArray("addresses", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
-		for _, address := range n.Addresses {
-			e.AppendString(address)
-		}
-		return nil
-	}))
+	enc.AddArray("addresses", marshalStringArray(n.Addresses))
 
 	return nil
 }
 
 func (l *LinuxCapabilities) MarshalLogObject(enc zapcore.ObjectEncoder) error {
-	enc.AddArray("bounding", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
-		for _, capability := range l.Bounding {
-			e.AppendString(capability)
-		}
-		return nil
-	}))
-
-	enc.AddArray("effective", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
-		for _, capability := range l.Effective {
-			e.AppendString(capability)
-		}
-		return nil
-	}))
-
-	enc.AddArray("inheritable", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
-		for _, capability := range l.Inheritable {
-			e.AppendString(capability)
-		}
-		return nil
-	}))
-
-	enc.AddArray("permitted", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
-		for _, capability := range l.Permitted {
-			e.AppendString(capability)
-		}
-		return nil
-	}))
-
-	enc.AddArray("ambient", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
-		for _, capability := range l.Ambient {
-			e.AppendString(capability)
-		}
-		return nil
-	}))
+	enc.AddArray("bounding", marshalStringArray(l.Bounding))
+	enc.AddArray("effective", marshalStringArray(l.Effective))
+	enc.AddArray("inheritable", marshalStringArray(l.Inheritable))
+	enc.AddArray("permitted", marshalStringArray(l.Permitted))
+	enc.AddArray("ambient", marshalStringArray(l.Ambient))
 
 	return nil
 }
@@ -81,14 +57,7 @@ func (r *Report) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddInt("pid", r.PID)
 	enc.AddObject("namespaces", &r.Namespaces)
 	enc.AddTime("created", r.Created)
-
-	enc.AddArray("mounts", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
-		for _, mount := range r.Mounts {
-			e.AppendString(mount)
-		}
-		return nil
-	}))
-
+	enc.AddArray("mounts", marshalStringArray(r.Mounts))
 	enc.AddString("cgroups_path", r.CgroupsPath)
 	enc.AddString("status", r.Status)
 	enc.AddObject("capabilities", r.Capabilities)
