@@ -109,7 +109,7 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	devices := make([]*audit.LinuxDevice, len(spec.Linux.Devices))
 	for i, dev := range spec.Linux.Devices {
-		devices[i] = &audit.LinuxDevice{&dev}
+		devices[i] = &audit.LinuxDevice{LinuxDevice: &dev}
 	}
 
 	r := audit.Report{
@@ -123,7 +123,7 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 		Mounts:       mounts,
 		CgroupsPath:  spec.Linux.CgroupsPath,
 		Status:       string(containerStatus),
-		Capabilities: &audit.LinuxCapabilities{spec.Process.Capabilities},
+		Capabilities: &audit.LinuxCapabilities{LinuxCapabilities: spec.Process.Capabilities},
 		Devices:      devices,
 	}
 
