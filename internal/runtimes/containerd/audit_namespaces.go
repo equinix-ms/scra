@@ -2,7 +2,7 @@ package containerd
 
 import (
 	"github.com/containerd/containerd/oci"
-	"github.com/equinix-ms/scra/pkg/audit"
+	"github.com/equinix-ms/scra/internal/audit"
 	specsgo "github.com/opencontainers/runtime-spec/specs-go"
 
 	"golang.org/x/sys/unix"

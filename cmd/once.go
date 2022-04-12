@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/equinix-ms/scra/pkg/runtimes/containerd"
+	"github.com/equinix-ms/scra/internal/runtimes/containerd"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

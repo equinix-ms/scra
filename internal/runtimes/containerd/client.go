@@ -33,12 +33,7 @@ func (c *Client) ListNamespaces() ([]string, error) {
 		return nil, fmt.Errorf("error listing namespaces: %v", err)
 	}
 
-	r := make([]string, len(nss))
-	for i, ns := range nss {
-		r[i] = ns
-	}
-
-	return r, nil
+	return nss, nil
 }
 
 func (c *Client) ListContainers(namespace string) ([]containerd.Container, error) {

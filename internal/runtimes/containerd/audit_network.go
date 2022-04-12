@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/equinix-ms/scra/pkg/audit"
+	"github.com/equinix-ms/scra/internal/audit"
 
 	"github.com/containerd/containerd/oci"
 	"github.com/vishvananda/netlink"
