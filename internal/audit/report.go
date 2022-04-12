@@ -28,16 +28,17 @@ type LinuxDevice struct {
 }
 
 type Report struct {
-	Runtime      string
-	ID           string
-	Image        string
-	PID          int
-	Namespaces   Namespaces
-	Networks     []NetworkInfo
-	Created      time.Time
-	Mounts       []string
-	CgroupsPath  string
-	Status       string
-	Capabilities *LinuxCapabilities
-	Devices      []*LinuxDevice
+	Runtime        string
+	Namespace      string
+	ID             string
+	Image          string
+	PID            int
+	HostNamespaces Namespaces
+	Networks       []NetworkInfo
+	Created        time.Time
+	Mounts         []string
+	CgroupsPath    string
+	Status         string
+	Capabilities   *LinuxCapabilities
+	Devices        []*LinuxDevice
 }

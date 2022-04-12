@@ -53,9 +53,10 @@ func (l *LinuxDevice) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 func (r *Report) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("runtime", r.Runtime)
 	enc.AddString("id", r.ID)
+	enc.AddString("namespace", r.Namespace)
 	enc.AddString("image", r.Image)
 	enc.AddInt("pid", r.PID)
-	enc.AddObject("namespaces", &r.Namespaces)
+	enc.AddObject("host_namespaces", &r.HostNamespaces)
 	enc.AddTime("created", r.Created)
 	enc.AddArray("mounts", marshalStringArray(r.Mounts))
 	enc.AddString("cgroups_path", r.CgroupsPath)
