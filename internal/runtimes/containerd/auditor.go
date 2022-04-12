@@ -6,7 +6,7 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/namespaces"
-	"github.com/equinix-ms/scra/pkg/audit"
+	"github.com/equinix-ms/scra/internal/audit"
 
 	"go.uber.org/zap"
 )
