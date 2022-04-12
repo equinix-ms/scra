@@ -10,9 +10,14 @@ jobs:
       changelog: ${{ steps.tag.outputs.changelog }}
       tag: ${{ steps.tag.outputs.new_tag }}
       version: ${{ steps.tag.outputs.new_version }}
+      date: ${{ steps.date.outputs.date }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+    - name: Save the date
+      id: date
+      run: |
+        echo ::set-output name=date::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
     - name: Bump version and tag
       uses: mathieudutour/github-tag-action@v6.0
       id: tag
@@ -64,7 +69,14 @@ jobs:
         tags: |
           ghcr.io/${{ github.repository }}:${{ needs.tag.outputs.tag }}
         labels: |
-          org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          org.opencontainers.image.title=${{ github.event.repository.name }}
+          org.opencontainers.image.description=${{ github.event.repository.description }}
+          org.opencontainers.image.url=${{ github.event.repository.html_url }}
+          org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+          org.opencontainers.image.created=${{ needs.tag.outputs.date }}
+          org.opencontainers.image.version=${{ needs.tag.outputs.tag }}
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
 
   release:
     needs:
