@@ -107,9 +107,14 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 		return fmt.Errorf("error getting network info: %v", err)
 	}
 
-	devices := make([]*audit.LinuxDevice, len(spec.Linux.Devices))
+	devices := make([]audit.LinuxDevice, len(spec.Linux.Devices))
 	for i, dev := range spec.Linux.Devices {
-		devices[i] = &audit.LinuxDevice{LinuxDevice: &dev}
+		devices[i] = audit.LinuxDevice{
+			Path:  dev.Path,
+			Type:  dev.Type,
+			Major: dev.Major,
+			Minor: dev.Minor,
+		}
 	}
 
 	r := audit.Report{

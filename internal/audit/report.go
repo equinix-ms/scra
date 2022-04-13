@@ -24,13 +24,16 @@ type LinuxCapabilities struct {
 }
 
 type LinuxDevice struct {
-	*specsgo.LinuxDevice
+	Path  string
+	Type  string
+	Major int64
+	Minor int64
 }
 
 type Report struct {
 	Runtime        string
-	Namespace      string
 	ID             string
+	Namespace      string
 	Image          string
 	PID            int
 	HostNamespaces Namespaces
@@ -40,5 +43,5 @@ type Report struct {
 	CgroupsPath    string
 	Status         string
 	Capabilities   *LinuxCapabilities
-	Devices        []*LinuxDevice
+	Devices        []LinuxDevice
 }
