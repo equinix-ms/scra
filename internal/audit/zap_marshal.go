@@ -65,7 +65,7 @@ func (r *Report) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 
 	enc.AddArray("devices", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
 		for _, device := range r.Devices {
-			e.AppendObject(device)
+			e.AppendObject(&device)
 		}
 		return nil
 	}))
