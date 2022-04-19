@@ -53,9 +53,10 @@ func (l *LinuxDevice) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 func (r *Report) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("runtime", r.Runtime)
 	enc.AddString("id", r.ID)
+	enc.AddString("namespace", r.Namespace)
 	enc.AddString("image", r.Image)
 	enc.AddInt("pid", r.PID)
-	enc.AddObject("namespaces", &r.Namespaces)
+	enc.AddObject("host_namespaces", &r.HostNamespaces)
 	enc.AddTime("created", r.Created)
 	enc.AddArray("mounts", marshalStringArray(r.Mounts))
 	enc.AddString("cgroups_path", r.CgroupsPath)
@@ -64,7 +65,7 @@ func (r *Report) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 
 	enc.AddArray("devices", zapcore.ArrayMarshalerFunc(func(e zapcore.ArrayEncoder) error {
 		for _, device := range r.Devices {
-			e.AppendObject(device)
+			e.AppendObject(&device)
 		}
 		return nil
 	}))

@@ -97,7 +97,7 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 		mounts[i] = mount.Source
 	}
 
-	namespaces, err := getNamespaceInfo(spec, a.rootPrefix)
+	hostNamespaces, err := getNamespaceInfo(spec, a.rootPrefix)
 	if err != nil {
 		return fmt.Errorf("error getting namespace info: %v", err)
 	}
@@ -107,24 +107,30 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 		return fmt.Errorf("error getting network info: %v", err)
 	}
 
-	devices := make([]*audit.LinuxDevice, len(spec.Linux.Devices))
+	devices := make([]audit.LinuxDevice, len(spec.Linux.Devices))
 	for i, dev := range spec.Linux.Devices {
-		devices[i] = &audit.LinuxDevice{LinuxDevice: &dev}
+		devices[i] = audit.LinuxDevice{
+			Path:  dev.Path,
+			Type:  dev.Type,
+			Major: dev.Major,
+			Minor: dev.Minor,
+		}
 	}
 
 	r := audit.Report{
-		Runtime:      info.Runtime.Name,
-		ID:           container.ID(),
-		Image:        image.Name(),
-		PID:          -1, // we will fill it in later, if we can find it
-		Namespaces:   *namespaces,
-		Networks:     networks,
-		Created:      info.CreatedAt,
-		Mounts:       mounts,
-		CgroupsPath:  spec.Linux.CgroupsPath,
-		Status:       string(containerStatus),
-		Capabilities: &audit.LinuxCapabilities{LinuxCapabilities: spec.Process.Capabilities},
-		Devices:      devices,
+		Runtime:        info.Runtime.Name,
+		ID:             container.ID(),
+		Image:          image.Name(),
+		PID:            -1, // we will fill it in later, if we can find it
+		Namespace:      namespace,
+		HostNamespaces: *hostNamespaces,
+		Networks:       networks,
+		Created:        info.CreatedAt,
+		Mounts:         mounts,
+		CgroupsPath:    spec.Linux.CgroupsPath,
+		Status:         string(containerStatus),
+		Capabilities:   &audit.LinuxCapabilities{LinuxCapabilities: spec.Process.Capabilities},
+		Devices:        devices,
 	}
 
 	if task != nil {

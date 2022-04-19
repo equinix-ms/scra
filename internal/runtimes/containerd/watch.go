@@ -14,6 +14,7 @@ import (
 func (a *Auditor) Watch() error {
 	ctx := context.Background()
 	eventStream, errC := a.containerdClient.client.EventService().Subscribe(ctx, `topic=="/containers/create"`)
+	a.logger.Info("listening for containers/create events")
 	for {
 		var (
 			event *events.Envelope
