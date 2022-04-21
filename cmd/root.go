@@ -20,9 +20,13 @@ func init() {
 	flags.String("containerd-address", "/run/containerd/containerd.sock", "location of containerd endpoint")
 	flags.String("root-prefix", "", "root prefix when accessing /proc et al from a hostPath mount")
 
-	viper.BindPFlags(flags)
+	if err := viper.BindPFlags(flags); err != nil {
+		panic(err)
+	}
 }
 
 func Execute() {
-	rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		panic(err)
+	}
 }
