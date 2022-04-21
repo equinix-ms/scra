@@ -69,6 +69,7 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	task, err := container.Task(ctx, nil)
 	if err != nil {
+		a.logger.Info("received an error retrieving task", zap.Error(err))
 		task = nil // non running tasks error, apparantly. Flag with nil task
 	}
 
