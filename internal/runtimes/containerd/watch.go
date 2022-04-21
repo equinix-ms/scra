@@ -13,8 +13,8 @@ import (
 
 func (a *Auditor) Watch() error {
 	ctx := context.Background()
-	eventStream, errC := a.containerdClient.client.EventService().Subscribe(ctx, `topic=="/containers/create"`)
-	a.logger.Info("listening for containers/create events")
+	eventStream, errC := a.containerdClient.client.EventService().Subscribe(ctx, `topic=="/tasks/start"`)
+	a.logger.Info("listening for tasks/start events")
 	for {
 		var (
 			event *events.Envelope
@@ -39,10 +39,10 @@ func (a *Auditor) Watch() error {
 			}
 
 			switch t := e.(type) {
-			case *apievents.ContainerCreate:
+			case *apievents.TaskStart:
 				nsCtx := namespaces.WithNamespace(ctx, event.Namespace)
 
-				container, err := a.containerdClient.client.LoadContainer(nsCtx, t.ID)
+				container, err := a.containerdClient.client.LoadContainer(nsCtx, t.ContainerID)
 				if err != nil {
 					a.logger.Warn("error getting container details", zap.Error(err))
 					continue
