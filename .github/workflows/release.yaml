@@ -46,6 +46,7 @@ jobs:
       with:
         name: scra-artifact
         path: scra-*-*
+        retention-days: 1
 
   containers:
     runs-on: ubuntu-latest
