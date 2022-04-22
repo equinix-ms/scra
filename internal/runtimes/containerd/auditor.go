@@ -89,7 +89,8 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	image, err := container.Image(ctx)
 	if err != nil {
-		return fmt.Errorf("error getting image information: %v", err)
+		a.logger.Info("received an error retrieving image", zap.Error(err))
+		image = nil
 	}
 
 	info, err := container.Info(ctx, containerd.WithoutRefreshedMetadata)
@@ -126,8 +127,8 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 		Address:        a.address,
 		Runtime:        info.Runtime.Name,
 		ID:             container.ID(),
-		Image:          image.Name(),
-		PID:            -1, // we will fill it in later, if we can find it
+		Image:          "-", // we will fill it in later, if we can find it
+		PID:            -1,  // we will fill it in later, if we can find it
 		Namespace:      namespace,
 		HostNamespaces: *hostNamespaces,
 		Networks:       networks,
@@ -141,6 +142,10 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	if task != nil {
 		r.PID = int(task.Pid())
+	}
+
+	if image != nil {
+		r.Image = image.Name()
 	}
 
 	a.logger.Info("container audit report", zap.Object("report", &r))
