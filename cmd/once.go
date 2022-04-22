@@ -23,6 +23,11 @@ func init() {
 }
 
 func once(cmd *cobra.Command, args []string) {
+	logger, err := getLogger()
+	if err != nil {
+		panic(fmt.Errorf("error setting up zap logging: %v", err))
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -30,7 +35,7 @@ func once(cmd *cobra.Command, args []string) {
 	rootPrefix := viper.GetString("root-prefix")
 
 	for _, address := range viper.GetStringSlice("containerd-address") {
-		a, err := containerd.NewAuditor(address, rootPrefix, gctx)
+		a, err := containerd.NewAuditor(address, rootPrefix, gctx, logger)
 		if err != nil {
 			panic(err)
 		}
@@ -45,7 +50,7 @@ func once(cmd *cobra.Command, args []string) {
 		})
 	}
 
-	err := group.Wait()
+	err = group.Wait()
 	if err != nil {
 		fmt.Printf("error: %v\n", err)
 	}
