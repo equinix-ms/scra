@@ -12,26 +12,25 @@ import (
 )
 
 type Auditor struct {
+	address          string
 	containerdClient *Client
 	rootPrefix       string
 	logger           *zap.Logger
+	context          context.Context
 }
 
-func NewAuditor(address string, prefix string) (*Auditor, error) {
-	client, err := NewClient(address)
+func NewAuditor(address string, prefix string, ctx context.Context, logger *zap.Logger) (*Auditor, error) {
+	client, err := NewClient(address, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %v", err)
 	}
 
-	logger, err := zap.NewProduction()
-	if err != nil {
-		return nil, fmt.Errorf("error setting up zap logging: %v", err)
-	}
-
 	a := &Auditor{
+		address:          address,
 		containerdClient: client,
 		rootPrefix:       prefix,
 		logger:           logger,
+		context:          ctx,
 	}
 
 	return a, nil
@@ -61,7 +60,7 @@ func (a *Auditor) AuditOnce() error {
 }
 
 func (a *Auditor) auditContainer(namespace string, container containerd.Container) error {
-	ctx := namespaces.WithNamespace(context.Background(), namespace)
+	ctx := namespaces.WithNamespace(a.context, namespace)
 	spec, err := container.Spec(ctx)
 	if err != nil {
 		return fmt.Errorf("error getting spec: %v", err)
@@ -69,7 +68,7 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	task, err := container.Task(ctx, nil)
 	if err != nil {
-		a.logger.Info("received an error retrieving task", zap.Error(err))
+		a.logger.Debug("received an error retrieving task", zap.Error(err))
 		task = nil // non running tasks error, apparantly. Flag with nil task
 	}
 
@@ -85,7 +84,8 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	image, err := container.Image(ctx)
 	if err != nil {
-		return fmt.Errorf("error getting image information: %v", err)
+		a.logger.Debug("received an error retrieving image", zap.Error(err))
+		image = nil
 	}
 
 	info, err := container.Info(ctx, containerd.WithoutRefreshedMetadata)
@@ -119,10 +119,11 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 	}
 
 	r := audit.Report{
+		Address:        a.address,
 		Runtime:        info.Runtime.Name,
 		ID:             container.ID(),
-		Image:          image.Name(),
-		PID:            -1, // we will fill it in later, if we can find it
+		Image:          "-", // we will fill it in later, if we can find it
+		PID:            -1,  // we will fill it in later, if we can find it
 		Namespace:      namespace,
 		HostNamespaces: *hostNamespaces,
 		Networks:       networks,
@@ -136,6 +137,10 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	if task != nil {
 		r.PID = int(task.Pid())
+	}
+
+	if image != nil {
+		r.Image = image.Name()
 	}
 
 	a.logger.Info("container audit report", zap.Object("report", &r))

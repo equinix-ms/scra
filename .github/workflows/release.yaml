@@ -25,6 +25,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
   binaries:
+    name: build binaries
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -34,7 +35,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
     - name: Setup Go
-      uses: actions/setup-go@v3
+      uses: WillAbides/setup-go-faster@v1.7.0
       with:
         go-version: '1.17'
     - name: Build
@@ -46,8 +47,10 @@ jobs:
       with:
         name: scra-artifact
         path: scra-*-*
+        retention-days: 1
 
-  containers:
+  container:
+    name: build container
     runs-on: ubuntu-latest
     needs: tag
     steps:

@@ -9,16 +9,17 @@ import (
 )
 
 type Client struct {
-	client *containerd.Client
+	client  *containerd.Client
+	context context.Context
 }
 
-func NewClient(address string) (*Client, error) {
+func NewClient(address string, ctx context.Context) (*Client, error) {
 	client, err := containerd.New(address)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to containerd: %v", err)
 	}
 
-	return &Client{client: client}, nil
+	return &Client{client: client, context: ctx}, nil
 }
 
 func (c *Client) Close() {
@@ -26,9 +27,8 @@ func (c *Client) Close() {
 }
 
 func (c *Client) ListNamespaces() ([]string, error) {
-	ctx := context.Background()
 	namespaces := c.client.NamespaceService()
-	nss, err := namespaces.List(ctx)
+	nss, err := namespaces.List(c.context)
 	if err != nil {
 		return nil, fmt.Errorf("error listing namespaces: %v", err)
 	}
@@ -37,7 +37,7 @@ func (c *Client) ListNamespaces() ([]string, error) {
 }
 
 func (c *Client) ListContainers(namespace string) ([]containerd.Container, error) {
-	ctx := namespaces.WithNamespace(context.Background(), namespace)
+	ctx := namespaces.WithNamespace(c.context, namespace)
 	containers, err := c.client.Containers(ctx, "")
 	if err != nil {
 		return nil, fmt.Errorf("error listing containers: %v", err)
