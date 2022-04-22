@@ -14,7 +14,7 @@ import (
 func (a *Auditor) Watch() error {
 	ctx := context.Background()
 	eventStream, errC := a.containerdClient.client.EventService().Subscribe(ctx, `topic=="/tasks/start"`)
-	a.logger.Info("listening for tasks/start events")
+	a.logger.Info("listening for tasks/start events", zap.String("address", a.address))
 	for {
 		var (
 			event *events.Envelope

@@ -12,6 +12,7 @@ import (
 )
 
 type Auditor struct {
+	address          string
 	containerdClient *Client
 	rootPrefix       string
 	logger           *zap.Logger
@@ -29,6 +30,7 @@ func NewAuditor(address string, prefix string) (*Auditor, error) {
 	}
 
 	a := &Auditor{
+		address:          address,
 		containerdClient: client,
 		rootPrefix:       prefix,
 		logger:           logger,
@@ -119,6 +121,7 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 	}
 
 	r := audit.Report{
+		Address:        a.address,
 		Runtime:        info.Runtime.Name,
 		ID:             container.ID(),
 		Image:          image.Name(),
