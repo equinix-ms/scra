@@ -19,6 +19,7 @@ func init() {
 	flags := rootCmd.PersistentFlags()
 	flags.StringSlice("containerd-address", []string{"/run/containerd/containerd.sock"}, "location of containerd endpoint")
 	flags.String("root-prefix", "", "root prefix when accessing /proc et al from a hostPath mount")
+	flags.Bool("debug", false, "increase verbosity")
 
 	if err := viper.BindPFlags(flags); err != nil {
 		panic(err)

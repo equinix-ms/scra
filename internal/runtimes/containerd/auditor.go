@@ -19,15 +19,10 @@ type Auditor struct {
 	context          context.Context
 }
 
-func NewAuditor(address string, prefix string, ctx context.Context) (*Auditor, error) {
+func NewAuditor(address string, prefix string, ctx context.Context, logger *zap.Logger) (*Auditor, error) {
 	client, err := NewClient(address, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %v", err)
-	}
-
-	logger, err := zap.NewProduction()
-	if err != nil {
-		return nil, fmt.Errorf("error setting up zap logging: %v", err)
 	}
 
 	a := &Auditor{
