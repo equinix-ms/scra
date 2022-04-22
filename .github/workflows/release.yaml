@@ -82,7 +82,7 @@ jobs:
   release:
     needs:
     - tag
-    - containers
+    - container
     - binaries
     runs-on: ubuntu-latest
     steps:
