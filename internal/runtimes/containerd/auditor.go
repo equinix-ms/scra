@@ -16,10 +16,11 @@ type Auditor struct {
 	containerdClient *Client
 	rootPrefix       string
 	logger           *zap.Logger
+	context          context.Context
 }
 
-func NewAuditor(address string, prefix string) (*Auditor, error) {
-	client, err := NewClient(address)
+func NewAuditor(address string, prefix string, ctx context.Context) (*Auditor, error) {
+	client, err := NewClient(address, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %v", err)
 	}
@@ -34,6 +35,7 @@ func NewAuditor(address string, prefix string) (*Auditor, error) {
 		containerdClient: client,
 		rootPrefix:       prefix,
 		logger:           logger,
+		context:          ctx,
 	}
 
 	return a, nil
@@ -63,7 +65,7 @@ func (a *Auditor) AuditOnce() error {
 }
 
 func (a *Auditor) auditContainer(namespace string, container containerd.Container) error {
-	ctx := namespaces.WithNamespace(context.Background(), namespace)
+	ctx := namespaces.WithNamespace(a.context, namespace)
 	spec, err := container.Spec(ctx)
 	if err != nil {
 		return fmt.Errorf("error getting spec: %v", err)
