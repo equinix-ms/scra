@@ -73,7 +73,7 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	task, err := container.Task(ctx, nil)
 	if err != nil {
-		a.logger.Info("received an error retrieving task", zap.Error(err))
+		a.logger.Debug("received an error retrieving task", zap.Error(err))
 		task = nil // non running tasks error, apparantly. Flag with nil task
 	}
 
@@ -89,7 +89,7 @@ func (a *Auditor) auditContainer(namespace string, container containerd.Containe
 
 	image, err := container.Image(ctx)
 	if err != nil {
-		a.logger.Info("received an error retrieving image", zap.Error(err))
+		a.logger.Debug("received an error retrieving image", zap.Error(err))
 		image = nil
 	}
 
