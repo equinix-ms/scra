@@ -31,6 +31,7 @@ type LinuxDevice struct {
 }
 
 type Report struct {
+	Address        string
 	Runtime        string
 	ID             string
 	Namespace      string

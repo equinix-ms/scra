@@ -1,8 +1,6 @@
 package containerd
 
 import (
-	"context"
-
 	apievents "github.com/containerd/containerd/api/events"
 	"github.com/containerd/containerd/events"
 	"github.com/containerd/containerd/namespaces"
@@ -12,15 +10,17 @@ import (
 )
 
 func (a *Auditor) Watch() error {
-	ctx := context.Background()
-	eventStream, errC := a.containerdClient.client.EventService().Subscribe(ctx, `topic=="/tasks/start"`)
-	a.logger.Info("listening for tasks/start events")
+	eventStream, errC := a.containerdClient.client.EventService().Subscribe(a.context, `topic=="/tasks/start"`)
+	a.logger.Info("listening for tasks/start events", zap.String("address", a.address))
 	for {
 		var (
 			event *events.Envelope
 			err   error
 		)
 		select {
+		case <-a.context.Done():
+			a.logger.Info("i have been canceled")
+			return nil
 		case err = <-errC:
 			if err != nil {
 				a.logger.Warn("received error", zap.Error(err))
@@ -40,7 +40,7 @@ func (a *Auditor) Watch() error {
 
 			switch t := e.(type) {
 			case *apievents.TaskStart:
-				nsCtx := namespaces.WithNamespace(ctx, event.Namespace)
+				nsCtx := namespaces.WithNamespace(a.context, event.Namespace)
 
 				container, err := a.containerdClient.client.LoadContainer(nsCtx, t.ContainerID)
 				if err != nil {
