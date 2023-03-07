@@ -103,5 +103,5 @@ jobs:
 
           ${{ needs.tag.outputs.changelog }}
 
-          Docker image: ghcr.io/${{ github.repository }}:${{ needs.tag.outputs.tag }}
+          Docker image: `ghcr.io/${{ github.repository }}:${{ needs.tag.outputs.tag }}`
         files: scra-*-*,scra.sha256
