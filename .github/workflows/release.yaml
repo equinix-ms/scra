@@ -17,7 +17,7 @@ jobs:
     - name: Save the date
       id: date
       run: |
-        echo ::set-output name=date::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        echo date=$(date -u +'%Y-%m-%dT%H:%M:%SZ') >> $GITHUB_OUTPUT
     - name: Bump version and tag
       uses: mathieudutour/github-tag-action@v6.0
       id: tag
