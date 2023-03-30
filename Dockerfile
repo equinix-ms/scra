@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.17 as builder
+FROM --platform=$BUILDPLATFORM golang:1.19 as builder
 RUN mkdir /workdir
 WORKDIR /workdir
 COPY . /workdir
